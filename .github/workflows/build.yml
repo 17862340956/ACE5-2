@@ -24,10 +24,10 @@ jobs:
         run: |
           mkdir -p build_logs
           {
-            echo 'BUILD_KIT_REVISION=checkout-fix-r2'
+            echo 'BUILD_KIT_REVISION=full-inputs-r3'
             pwd
             git rev-parse HEAD
-            git ls-files -- self_check.py verify_kit.py .github/workflows/build.yml
+            git ls-files -- self_check.py verify_kit.py TARGET_PROFILE.json TARGET_BTF.json TARGET_CONFIG.txt .github/workflows/build.yml
           } | tee build_logs/checkout.txt
           for required in self_check.py verify_kit.py .github/workflows/build.yml; do
             if [ ! -f "$required" ]; then
