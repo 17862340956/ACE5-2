@@ -1,0 +1,34 @@
+{
+  "kit": "pkg110-ddk-r1",
+  "revision": "qilin-pkg110-61-r1",
+  "device_model": "PKG110",
+  "device": "OP5D2BL1",
+  "platform": "pineapple",
+  "soc": "SM8650",
+  "target_release": "6.1.141-android14-11-o-g41d58e50fc53",
+  "ddk_target": "android14-6.1",
+  "android_release": "16",
+  "sdk": 36,
+  "config_sha256": "46108facbb8eee9c4e721243cf8687ffb97d7dcde49aae08cf49071baeebb661",
+  "btf_sha256": "3e689a4312d2fea4a7a053ccf1d0d48bd6922f84e3006ba11e073d47a8e42422",
+  "display_preset": "HUAWEI Kirin 9020 / 12 核三簇",
+  "author": "杏仁 / xingren",
+  "topology": {
+    "observed_cpu_count": 8,
+    "parts": [
+      "0xd80",
+      "0xd81",
+      "0xd82"
+    ],
+    "display_cpu_count": 12,
+    "preserve_runtime_topology": true
+  },
+  "validation_gaps": [
+    "docker compilation unavailable on delivery host",
+    "actual insmod unavailable",
+    "long-term stability unavailable",
+    "lockdown status unreadable",
+    "complete CRC proof unavailable",
+    "KCFI callback proof unavailable"
+  ]
+}

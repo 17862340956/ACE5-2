@@ -1,0 +1,2337 @@
+{
+  "file": "kernel_profile_20261102_230543_25481/btf/vmlinux.btf",
+  "sha256": "3e689a4312d2fea4a7a053ccf1d0d48bd6922f84e3006ba11e073d47a8e42422",
+  "bytes": 5788319,
+  "type_count": 134344,
+  "layouts": {
+    "attribute": {
+      "type_ids": [
+        155
+      ],
+      "size": 16,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "name",
+          "type": "char *",
+          "type_id": 2,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "mode",
+          "type": "unsigned short",
+          "type_id": 156,
+          "bit_offset": 64,
+          "byte_offset": 8
+        }
+      ]
+    },
+    "inode": {
+      "type_ids": [
+        178,
+        48168
+      ],
+      "size": 704,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "i_mode",
+          "type": "unsigned short",
+          "type_id": 156,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "i_opflags",
+          "type": "unsigned short",
+          "type_id": 73,
+          "bit_offset": 16,
+          "byte_offset": 2
+        },
+        {
+          "name": "i_uid",
+          "type": "kind_4",
+          "type_id": 179,
+          "bit_offset": 32,
+          "byte_offset": 4
+        },
+        {
+          "name": "i_gid",
+          "type": "kind_4",
+          "type_id": 183,
+          "bit_offset": 64,
+          "byte_offset": 8
+        },
+        {
+          "name": "i_flags",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 96,
+          "byte_offset": 12
+        },
+        {
+          "name": "i_acl",
+          "type": "posix_acl *",
+          "type_id": 187,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "i_default_acl",
+          "type": "posix_acl *",
+          "type_id": 187,
+          "bit_offset": 192,
+          "byte_offset": 24
+        },
+        {
+          "name": "i_op",
+          "type": "inode_operations *",
+          "type_id": 188,
+          "bit_offset": 256,
+          "byte_offset": 32
+        },
+        {
+          "name": "i_sb",
+          "type": "super_block *",
+          "type_id": 243,
+          "bit_offset": 320,
+          "byte_offset": 40
+        },
+        {
+          "name": "i_mapping",
+          "type": "address_space *",
+          "type_id": 171,
+          "bit_offset": 384,
+          "byte_offset": 48
+        },
+        {
+          "name": "i_security",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 448,
+          "byte_offset": 56
+        },
+        {
+          "name": "i_ino",
+          "type": "unsigned long",
+          "type_id": 10,
+          "bit_offset": 512,
+          "byte_offset": 64
+        },
+        {
+          "name": "",
+          "type": "kind_5",
+          "type_id": 174,
+          "bit_offset": 576,
+          "byte_offset": 72
+        },
+        {
+          "name": "i_rdev",
+          "type": "unsigned int",
+          "type_id": 245,
+          "bit_offset": 608,
+          "byte_offset": 76
+        },
+        {
+          "name": "i_size",
+          "type": "long long",
+          "type_id": 88,
+          "bit_offset": 640,
+          "byte_offset": 80
+        },
+        {
+          "name": "i_atime",
+          "type": "timespec64",
+          "type_id": 2043,
+          "bit_offset": 704,
+          "byte_offset": 88
+        },
+        {
+          "name": "i_mtime",
+          "type": "timespec64",
+          "type_id": 2043,
+          "bit_offset": 832,
+          "byte_offset": 104
+        },
+        {
+          "name": "i_ctime",
+          "type": "timespec64",
+          "type_id": 2043,
+          "bit_offset": 960,
+          "byte_offset": 120
+        },
+        {
+          "name": "i_lock",
+          "type": "spinlock",
+          "type_id": 121,
+          "bit_offset": 1088,
+          "byte_offset": 136
+        },
+        {
+          "name": "i_bytes",
+          "type": "unsigned short",
+          "type_id": 73,
+          "bit_offset": 1120,
+          "byte_offset": 140
+        },
+        {
+          "name": "i_blkbits",
+          "type": "unsigned char",
+          "type_id": 68,
+          "bit_offset": 1136,
+          "byte_offset": 142
+        },
+        {
+          "name": "i_write_hint",
+          "type": "unsigned char",
+          "type_id": 68,
+          "bit_offset": 1144,
+          "byte_offset": 143
+        },
+        {
+          "name": "i_blocks",
+          "type": "unsigned long long",
+          "type_id": 1954,
+          "bit_offset": 1152,
+          "byte_offset": 144
+        },
+        {
+          "name": "i_state",
+          "type": "unsigned long",
+          "type_id": 10,
+          "bit_offset": 1216,
+          "byte_offset": 152
+        },
+        {
+          "name": "i_rwsem",
+          "type": "rw_semaphore",
+          "type_id": 655,
+          "bit_offset": 1280,
+          "byte_offset": 160
+        },
+        {
+          "name": "dirtied_when",
+          "type": "unsigned long",
+          "type_id": 10,
+          "bit_offset": 1792,
+          "byte_offset": 224
+        },
+        {
+          "name": "dirtied_time_when",
+          "type": "unsigned long",
+          "type_id": 10,
+          "bit_offset": 1856,
+          "byte_offset": 232
+        },
+        {
+          "name": "i_hash",
+          "type": "hlist_node",
+          "type_id": 39,
+          "bit_offset": 1920,
+          "byte_offset": 240
+        },
+        {
+          "name": "i_io_list",
+          "type": "list_head",
+          "type_id": 33,
+          "bit_offset": 2048,
+          "byte_offset": 256
+        },
+        {
+          "name": "i_wb",
+          "type": "bdi_writeback *",
+          "type_id": 1873,
+          "bit_offset": 2176,
+          "byte_offset": 272
+        },
+        {
+          "name": "i_wb_frn_winner",
+          "type": "int",
+          "type_id": 9,
+          "bit_offset": 2240,
+          "byte_offset": 280
+        },
+        {
+          "name": "i_wb_frn_avg_time",
+          "type": "unsigned short",
+          "type_id": 71,
+          "bit_offset": 2272,
+          "byte_offset": 284
+        },
+        {
+          "name": "i_wb_frn_history",
+          "type": "unsigned short",
+          "type_id": 71,
+          "bit_offset": 2288,
+          "byte_offset": 286
+        },
+        {
+          "name": "i_lru",
+          "type": "list_head",
+          "type_id": 33,
+          "bit_offset": 2304,
+          "byte_offset": 288
+        },
+        {
+          "name": "i_sb_list",
+          "type": "list_head",
+          "type_id": 33,
+          "bit_offset": 2432,
+          "byte_offset": 304
+        },
+        {
+          "name": "i_wb_list",
+          "type": "list_head",
+          "type_id": 33,
+          "bit_offset": 2560,
+          "byte_offset": 320
+        },
+        {
+          "name": "",
+          "type": "kind_5",
+          "type_id": 175,
+          "bit_offset": 2688,
+          "byte_offset": 336
+        },
+        {
+          "name": "i_version",
+          "type": "kind_4",
+          "type_id": 56,
+          "bit_offset": 2816,
+          "byte_offset": 352
+        },
+        {
+          "name": "i_sequence",
+          "type": "kind_4",
+          "type_id": 56,
+          "bit_offset": 2880,
+          "byte_offset": 360
+        },
+        {
+          "name": "i_count",
+          "type": "kind_4",
+          "type_id": 7,
+          "bit_offset": 2944,
+          "byte_offset": 368
+        },
+        {
+          "name": "i_dio_count",
+          "type": "kind_4",
+          "type_id": 7,
+          "bit_offset": 2976,
+          "byte_offset": 372
+        },
+        {
+          "name": "i_writecount",
+          "type": "kind_4",
+          "type_id": 7,
+          "bit_offset": 3008,
+          "byte_offset": 376
+        },
+        {
+          "name": "i_readcount",
+          "type": "kind_4",
+          "type_id": 7,
+          "bit_offset": 3040,
+          "byte_offset": 380
+        },
+        {
+          "name": "",
+          "type": "kind_5",
+          "type_id": 176,
+          "bit_offset": 3072,
+          "byte_offset": 384
+        },
+        {
+          "name": "i_flctx",
+          "type": "file_lock_context *",
+          "type_id": 2068,
+          "bit_offset": 3136,
+          "byte_offset": 392
+        },
+        {
+          "name": "i_data",
+          "type": "address_space",
+          "type_id": 172,
+          "bit_offset": 3200,
+          "byte_offset": 400
+        },
+        {
+          "name": "i_devices",
+          "type": "list_head",
+          "type_id": 33,
+          "bit_offset": 5120,
+          "byte_offset": 640
+        },
+        {
+          "name": "",
+          "type": "kind_5",
+          "type_id": 177,
+          "bit_offset": 5248,
+          "byte_offset": 656
+        },
+        {
+          "name": "i_generation",
+          "type": "unsigned int",
+          "type_id": 208,
+          "bit_offset": 5312,
+          "byte_offset": 664
+        },
+        {
+          "name": "i_fsnotify_mask",
+          "type": "unsigned int",
+          "type_id": 208,
+          "bit_offset": 5344,
+          "byte_offset": 668
+        },
+        {
+          "name": "i_fsnotify_marks",
+          "type": "fsnotify_mark_connector *",
+          "type_id": 1991,
+          "bit_offset": 5376,
+          "byte_offset": 672
+        },
+        {
+          "name": "i_crypt_info",
+          "type": "fscrypt_info *",
+          "type_id": 2072,
+          "bit_offset": 5440,
+          "byte_offset": 680
+        },
+        {
+          "name": "i_verity_info",
+          "type": "fsverity_info *",
+          "type_id": 2073,
+          "bit_offset": 5504,
+          "byte_offset": 688
+        },
+        {
+          "name": "i_private",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 5568,
+          "byte_offset": 696
+        }
+      ]
+    },
+    "file": {
+      "type_ids": [
+        274,
+        48333
+      ],
+      "size": 264,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "",
+          "type": "kind_5",
+          "type_id": 273,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "f_path",
+          "type": "path",
+          "type_id": 281,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "f_inode",
+          "type": "inode *",
+          "type_id": 173,
+          "bit_offset": 256,
+          "byte_offset": 32
+        },
+        {
+          "name": "f_op",
+          "type": "file_operations *",
+          "type_id": 282,
+          "bit_offset": 320,
+          "byte_offset": 40
+        },
+        {
+          "name": "f_lock",
+          "type": "spinlock",
+          "type_id": 121,
+          "bit_offset": 384,
+          "byte_offset": 48
+        },
+        {
+          "name": "f_count",
+          "type": "kind_4",
+          "type_id": 55,
+          "bit_offset": 448,
+          "byte_offset": 56
+        },
+        {
+          "name": "f_flags",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 512,
+          "byte_offset": 64
+        },
+        {
+          "name": "f_mode",
+          "type": "unsigned int",
+          "type_id": 1429,
+          "bit_offset": 544,
+          "byte_offset": 68
+        },
+        {
+          "name": "f_pos_lock",
+          "type": "mutex",
+          "type_id": 54,
+          "bit_offset": 576,
+          "byte_offset": 72
+        },
+        {
+          "name": "f_pos",
+          "type": "long long",
+          "type_id": 88,
+          "bit_offset": 960,
+          "byte_offset": 120
+        },
+        {
+          "name": "f_owner",
+          "type": "fown_struct",
+          "type_id": 1830,
+          "bit_offset": 1024,
+          "byte_offset": 128
+        },
+        {
+          "name": "f_cred",
+          "type": "cred *",
+          "type_id": 1199,
+          "bit_offset": 1280,
+          "byte_offset": 160
+        },
+        {
+          "name": "f_ra",
+          "type": "file_ra_state",
+          "type_id": 1832,
+          "bit_offset": 1344,
+          "byte_offset": 168
+        },
+        {
+          "name": "f_version",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 1600,
+          "byte_offset": 200
+        },
+        {
+          "name": "f_security",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 1664,
+          "byte_offset": 208
+        },
+        {
+          "name": "private_data",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 1728,
+          "byte_offset": 216
+        },
+        {
+          "name": "f_ep",
+          "type": "hlist_head *",
+          "type_id": 855,
+          "bit_offset": 1792,
+          "byte_offset": 224
+        },
+        {
+          "name": "f_mapping",
+          "type": "address_space *",
+          "type_id": 171,
+          "bit_offset": 1856,
+          "byte_offset": 232
+        },
+        {
+          "name": "f_wb_err",
+          "type": "unsigned int",
+          "type_id": 1833,
+          "bit_offset": 1920,
+          "byte_offset": 240
+        },
+        {
+          "name": "f_sb_err",
+          "type": "unsigned int",
+          "type_id": 1833,
+          "bit_offset": 1952,
+          "byte_offset": 244
+        },
+        {
+          "name": "android_kabi_reserved1",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 1984,
+          "byte_offset": 248
+        },
+        {
+          "name": "android_kabi_reserved2",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 2048,
+          "byte_offset": 256
+        }
+      ]
+    },
+    "kiocb": {
+      "type_ids": [
+        297,
+        48347
+      ],
+      "size": 48,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "ki_filp",
+          "type": "file *",
+          "type_id": 272,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "ki_pos",
+          "type": "long long",
+          "type_id": 88,
+          "bit_offset": 64,
+          "byte_offset": 8
+        },
+        {
+          "name": "ki_complete",
+          "type": "kind_13 *",
+          "type_id": 298,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "private",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 192,
+          "byte_offset": 24
+        },
+        {
+          "name": "ki_flags",
+          "type": "int",
+          "type_id": 9,
+          "bit_offset": 256,
+          "byte_offset": 32
+        },
+        {
+          "name": "ki_ioprio",
+          "type": "unsigned short",
+          "type_id": 71,
+          "bit_offset": 288,
+          "byte_offset": 36
+        },
+        {
+          "name": "ki_waitq",
+          "type": "wait_page_queue *",
+          "type_id": 300,
+          "bit_offset": 320,
+          "byte_offset": 40
+        }
+      ]
+    },
+    "device": {
+      "type_ids": [
+        324,
+        48227
+      ],
+      "size": 912,
+      "kflag": 1,
+      "members": [
+        {
+          "name": "kobj",
+          "type": "kobject",
+          "type_id": 117,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "parent",
+          "type": "device *",
+          "type_id": 323,
+          "bit_offset": 768,
+          "byte_offset": 96
+        },
+        {
+          "name": "p",
+          "type": "device_private *",
+          "type_id": 325,
+          "bit_offset": 832,
+          "byte_offset": 104
+        },
+        {
+          "name": "init_name",
+          "type": "char *",
+          "type_id": 2,
+          "bit_offset": 896,
+          "byte_offset": 112
+        },
+        {
+          "name": "type",
+          "type": "device_type *",
+          "type_id": 326,
+          "bit_offset": 960,
+          "byte_offset": 120
+        },
+        {
+          "name": "bus",
+          "type": "bus_type *",
+          "type_id": 343,
+          "bit_offset": 1024,
+          "byte_offset": 128
+        },
+        {
+          "name": "driver",
+          "type": "device_driver *",
+          "type_id": 347,
+          "bit_offset": 1088,
+          "byte_offset": 136
+        },
+        {
+          "name": "platform_data",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 1152,
+          "byte_offset": 144
+        },
+        {
+          "name": "driver_data",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 1216,
+          "byte_offset": 152
+        },
+        {
+          "name": "mutex",
+          "type": "mutex",
+          "type_id": 54,
+          "bit_offset": 1280,
+          "byte_offset": 160
+        },
+        {
+          "name": "links",
+          "type": "dev_links_info",
+          "type_id": 371,
+          "bit_offset": 1664,
+          "byte_offset": 208
+        },
+        {
+          "name": "power",
+          "type": "dev_pm_info",
+          "type_id": 373,
+          "bit_offset": 2112,
+          "byte_offset": 264
+        },
+        {
+          "name": "pm_domain",
+          "type": "dev_pm_domain *",
+          "type_id": 419,
+          "bit_offset": 4928,
+          "byte_offset": 616
+        },
+        {
+          "name": "em_pd",
+          "type": "em_perf_domain *",
+          "type_id": 423,
+          "bit_offset": 4992,
+          "byte_offset": 624
+        },
+        {
+          "name": "pins",
+          "type": "dev_pin_info *",
+          "type_id": 428,
+          "bit_offset": 5056,
+          "byte_offset": 632
+        },
+        {
+          "name": "msi",
+          "type": "dev_msi_info",
+          "type_id": 429,
+          "bit_offset": 5120,
+          "byte_offset": 640
+        },
+        {
+          "name": "dma_ops",
+          "type": "dma_map_ops *",
+          "type_id": 1664,
+          "bit_offset": 5248,
+          "byte_offset": 656
+        },
+        {
+          "name": "dma_mask",
+          "type": "unsigned long long *",
+          "type_id": 1353,
+          "bit_offset": 5312,
+          "byte_offset": 664
+        },
+        {
+          "name": "coherent_dma_mask",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 5376,
+          "byte_offset": 672
+        },
+        {
+          "name": "bus_dma_limit",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 5440,
+          "byte_offset": 680
+        },
+        {
+          "name": "dma_range_map",
+          "type": "bus_dma_region *",
+          "type_id": 1666,
+          "bit_offset": 5504,
+          "byte_offset": 688
+        },
+        {
+          "name": "dma_parms",
+          "type": "device_dma_parameters *",
+          "type_id": 1668,
+          "bit_offset": 5568,
+          "byte_offset": 696
+        },
+        {
+          "name": "dma_pools",
+          "type": "list_head",
+          "type_id": 33,
+          "bit_offset": 5632,
+          "byte_offset": 704
+        },
+        {
+          "name": "dma_mem",
+          "type": "dma_coherent_mem *",
+          "type_id": 1670,
+          "bit_offset": 5760,
+          "byte_offset": 720
+        },
+        {
+          "name": "cma_area",
+          "type": "cma *",
+          "type_id": 1671,
+          "bit_offset": 5824,
+          "byte_offset": 728
+        },
+        {
+          "name": "dma_io_tlb_mem",
+          "type": "io_tlb_mem *",
+          "type_id": 1672,
+          "bit_offset": 5888,
+          "byte_offset": 736
+        },
+        {
+          "name": "archdata",
+          "type": "dev_archdata",
+          "type_id": 1673,
+          "bit_offset": 5952,
+          "byte_offset": 744
+        },
+        {
+          "name": "of_node",
+          "type": "device_node *",
+          "type_id": 437,
+          "bit_offset": 5952,
+          "byte_offset": 744
+        },
+        {
+          "name": "fwnode",
+          "type": "fwnode_handle *",
+          "type_id": 441,
+          "bit_offset": 6016,
+          "byte_offset": 752
+        },
+        {
+          "name": "devt",
+          "type": "unsigned int",
+          "type_id": 245,
+          "bit_offset": 6080,
+          "byte_offset": 760
+        },
+        {
+          "name": "id",
+          "type": "unsigned int",
+          "type_id": 207,
+          "bit_offset": 6112,
+          "byte_offset": 764
+        },
+        {
+          "name": "devres_lock",
+          "type": "spinlock",
+          "type_id": 121,
+          "bit_offset": 6144,
+          "byte_offset": 768
+        },
+        {
+          "name": "devres_head",
+          "type": "list_head",
+          "type_id": 33,
+          "bit_offset": 6208,
+          "byte_offset": 776
+        },
+        {
+          "name": "class",
+          "type": "class *",
+          "type_id": 1674,
+          "bit_offset": 6336,
+          "byte_offset": 792
+        },
+        {
+          "name": "groups",
+          "type": "attribute_group * *",
+          "type_id": 159,
+          "bit_offset": 6400,
+          "byte_offset": 800
+        },
+        {
+          "name": "release",
+          "type": "kind_13 *",
+          "type_id": 336,
+          "bit_offset": 6464,
+          "byte_offset": 808
+        },
+        {
+          "name": "iommu_group",
+          "type": "iommu_group *",
+          "type_id": 1698,
+          "bit_offset": 6528,
+          "byte_offset": 816
+        },
+        {
+          "name": "iommu",
+          "type": "dev_iommu *",
+          "type_id": 1699,
+          "bit_offset": 6592,
+          "byte_offset": 824
+        },
+        {
+          "name": "physical_location",
+          "type": "device_physical_location *",
+          "type_id": 1700,
+          "bit_offset": 6656,
+          "byte_offset": 832
+        },
+        {
+          "name": "removable",
+          "type": "device_removable",
+          "type_id": 1705,
+          "bit_offset": 6720,
+          "byte_offset": 840
+        },
+        {
+          "name": "offline_disabled",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 6752,
+          "byte_offset": 844
+        },
+        {
+          "name": "offline",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 6753,
+          "byte_offset": 844
+        },
+        {
+          "name": "of_node_reused",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 6754,
+          "byte_offset": 844
+        },
+        {
+          "name": "state_synced",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 6755,
+          "byte_offset": 844
+        },
+        {
+          "name": "can_match",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 6756,
+          "byte_offset": 844
+        },
+        {
+          "name": "dma_coherent",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 6757,
+          "byte_offset": 844
+        },
+        {
+          "name": "android_kabi_reserved1",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 6784,
+          "byte_offset": 848
+        },
+        {
+          "name": "android_kabi_reserved2",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 6848,
+          "byte_offset": 856
+        },
+        {
+          "name": "android_kabi_reserved3",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 6912,
+          "byte_offset": 864
+        },
+        {
+          "name": "android_kabi_reserved4",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 6976,
+          "byte_offset": 872
+        },
+        {
+          "name": "android_kabi_reserved5",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 7040,
+          "byte_offset": 880
+        },
+        {
+          "name": "android_kabi_reserved6",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 7104,
+          "byte_offset": 888
+        },
+        {
+          "name": "android_kabi_reserved7",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 7168,
+          "byte_offset": 896
+        },
+        {
+          "name": "android_kabi_reserved8",
+          "type": "unsigned long long",
+          "type_id": 76,
+          "bit_offset": 7232,
+          "byte_offset": 904
+        }
+      ]
+    },
+    "seq_file": {
+      "type_ids": [
+        537,
+        48561
+      ],
+      "size": 136,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "buf",
+          "type": "char *",
+          "type_id": 36,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "size",
+          "type": "unsigned long",
+          "type_id": 85,
+          "bit_offset": 64,
+          "byte_offset": 8
+        },
+        {
+          "name": "from",
+          "type": "unsigned long",
+          "type_id": 85,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "count",
+          "type": "unsigned long",
+          "type_id": 85,
+          "bit_offset": 192,
+          "byte_offset": 24
+        },
+        {
+          "name": "pad_until",
+          "type": "unsigned long",
+          "type_id": 85,
+          "bit_offset": 256,
+          "byte_offset": 32
+        },
+        {
+          "name": "index",
+          "type": "long long",
+          "type_id": 88,
+          "bit_offset": 320,
+          "byte_offset": 40
+        },
+        {
+          "name": "read_pos",
+          "type": "long long",
+          "type_id": 88,
+          "bit_offset": 384,
+          "byte_offset": 48
+        },
+        {
+          "name": "lock",
+          "type": "mutex",
+          "type_id": 54,
+          "bit_offset": 448,
+          "byte_offset": 56
+        },
+        {
+          "name": "op",
+          "type": "seq_operations *",
+          "type_id": 538,
+          "bit_offset": 832,
+          "byte_offset": 104
+        },
+        {
+          "name": "poll_event",
+          "type": "int",
+          "type_id": 9,
+          "bit_offset": 896,
+          "byte_offset": 112
+        },
+        {
+          "name": "file",
+          "type": "file *",
+          "type_id": 549,
+          "bit_offset": 960,
+          "byte_offset": 120
+        },
+        {
+          "name": "private",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 1024,
+          "byte_offset": 128
+        }
+      ]
+    },
+    "seq_operations": {
+      "type_ids": [
+        540,
+        48564
+      ],
+      "size": 32,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "start",
+          "type": "kind_13 *",
+          "type_id": 541,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "stop",
+          "type": "kind_13 *",
+          "type_id": 543,
+          "bit_offset": 64,
+          "byte_offset": 8
+        },
+        {
+          "name": "next",
+          "type": "kind_13 *",
+          "type_id": 545,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "show",
+          "type": "kind_13 *",
+          "type_id": 547,
+          "bit_offset": 192,
+          "byte_offset": 24
+        }
+      ]
+    },
+    "uts_namespace": {
+      "type_ids": [
+        807
+      ],
+      "size": 432,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "name",
+          "type": "new_utsname",
+          "type_id": 808,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "user_ns",
+          "type": "user_namespace *",
+          "type_id": 783,
+          "bit_offset": 3136,
+          "byte_offset": 392
+        },
+        {
+          "name": "ucounts",
+          "type": "ucounts *",
+          "type_id": 810,
+          "bit_offset": 3200,
+          "byte_offset": 400
+        },
+        {
+          "name": "ns",
+          "type": "ns_common",
+          "type_id": 791,
+          "bit_offset": 3264,
+          "byte_offset": 408
+        }
+      ]
+    },
+    "new_utsname": {
+      "type_ids": [
+        808
+      ],
+      "size": 390,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "sysname",
+          "type": "kind_3",
+          "type_id": 809,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "nodename",
+          "type": "kind_3",
+          "type_id": 809,
+          "bit_offset": 520,
+          "byte_offset": 65
+        },
+        {
+          "name": "release",
+          "type": "kind_3",
+          "type_id": 809,
+          "bit_offset": 1040,
+          "byte_offset": 130
+        },
+        {
+          "name": "version",
+          "type": "kind_3",
+          "type_id": 809,
+          "bit_offset": 1560,
+          "byte_offset": 195
+        },
+        {
+          "name": "machine",
+          "type": "kind_3",
+          "type_id": 809,
+          "bit_offset": 2080,
+          "byte_offset": 260
+        },
+        {
+          "name": "domainname",
+          "type": "kind_3",
+          "type_id": 809,
+          "bit_offset": 2600,
+          "byte_offset": 325
+        }
+      ]
+    },
+    "iov_iter": {
+      "type_ids": [
+        1738,
+        48502
+      ],
+      "size": 40,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "iter_type",
+          "type": "unsigned char",
+          "type_id": 68,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "nofault",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 8,
+          "byte_offset": 1
+        },
+        {
+          "name": "data_source",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 16,
+          "byte_offset": 2
+        },
+        {
+          "name": "user_backed",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 24,
+          "byte_offset": 3
+        },
+        {
+          "name": "",
+          "type": "kind_5",
+          "type_id": 1734,
+          "bit_offset": 64,
+          "byte_offset": 8
+        },
+        {
+          "name": "count",
+          "type": "unsigned long",
+          "type_id": 85,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "",
+          "type": "kind_5",
+          "type_id": 1735,
+          "bit_offset": 192,
+          "byte_offset": 24
+        },
+        {
+          "name": "",
+          "type": "kind_5",
+          "type_id": 1737,
+          "bit_offset": 256,
+          "byte_offset": 32
+        }
+      ]
+    },
+    "device_attribute": {
+      "type_ids": [
+        4663
+      ],
+      "size": 32,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "attr",
+          "type": "attribute",
+          "type_id": 155,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "show",
+          "type": "kind_13 *",
+          "type_id": 4664,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "store",
+          "type": "kind_13 *",
+          "type_id": 4667,
+          "bit_offset": 192,
+          "byte_offset": 24
+        }
+      ]
+    },
+    "cpufreq_policy": {
+      "type_ids": [
+        5030
+      ],
+      "size": 760,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "cpus",
+          "type": "kind_3",
+          "type_id": 90,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "related_cpus",
+          "type": "kind_3",
+          "type_id": 90,
+          "bit_offset": 64,
+          "byte_offset": 8
+        },
+        {
+          "name": "real_cpus",
+          "type": "kind_3",
+          "type_id": 90,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "shared_type",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 192,
+          "byte_offset": 24
+        },
+        {
+          "name": "cpu",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 224,
+          "byte_offset": 28
+        },
+        {
+          "name": "clk",
+          "type": "clk *",
+          "type_id": 5031,
+          "bit_offset": 256,
+          "byte_offset": 32
+        },
+        {
+          "name": "cpuinfo",
+          "type": "cpufreq_cpuinfo",
+          "type_id": 5032,
+          "bit_offset": 320,
+          "byte_offset": 40
+        },
+        {
+          "name": "min",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 416,
+          "byte_offset": 52
+        },
+        {
+          "name": "max",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 448,
+          "byte_offset": 56
+        },
+        {
+          "name": "cur",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 480,
+          "byte_offset": 60
+        },
+        {
+          "name": "suspend_freq",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 512,
+          "byte_offset": 64
+        },
+        {
+          "name": "policy",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 544,
+          "byte_offset": 68
+        },
+        {
+          "name": "last_policy",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 576,
+          "byte_offset": 72
+        },
+        {
+          "name": "governor",
+          "type": "cpufreq_governor *",
+          "type_id": 5033,
+          "bit_offset": 640,
+          "byte_offset": 80
+        },
+        {
+          "name": "governor_data",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 704,
+          "byte_offset": 88
+        },
+        {
+          "name": "last_governor",
+          "type": "kind_3",
+          "type_id": 1358,
+          "bit_offset": 768,
+          "byte_offset": 96
+        },
+        {
+          "name": "update",
+          "type": "work_struct",
+          "type_id": 404,
+          "bit_offset": 896,
+          "byte_offset": 112
+        },
+        {
+          "name": "constraints",
+          "type": "freq_constraints",
+          "type_id": 3973,
+          "bit_offset": 1280,
+          "byte_offset": 160
+        },
+        {
+          "name": "min_freq_req",
+          "type": "freq_qos_request *",
+          "type_id": 5043,
+          "bit_offset": 3072,
+          "byte_offset": 384
+        },
+        {
+          "name": "max_freq_req",
+          "type": "freq_qos_request *",
+          "type_id": 5043,
+          "bit_offset": 3136,
+          "byte_offset": 392
+        },
+        {
+          "name": "freq_table",
+          "type": "cpufreq_frequency_table *",
+          "type_id": 5044,
+          "bit_offset": 3200,
+          "byte_offset": 400
+        },
+        {
+          "name": "freq_table_sorted",
+          "type": "cpufreq_table_sorting",
+          "type_id": 5023,
+          "bit_offset": 3264,
+          "byte_offset": 408
+        },
+        {
+          "name": "policy_list",
+          "type": "list_head",
+          "type_id": 33,
+          "bit_offset": 3328,
+          "byte_offset": 416
+        },
+        {
+          "name": "kobj",
+          "type": "kobject",
+          "type_id": 117,
+          "bit_offset": 3456,
+          "byte_offset": 432
+        },
+        {
+          "name": "kobj_unregister",
+          "type": "completion",
+          "type_id": 374,
+          "bit_offset": 4224,
+          "byte_offset": 528
+        },
+        {
+          "name": "rwsem",
+          "type": "rw_semaphore",
+          "type_id": 655,
+          "bit_offset": 4480,
+          "byte_offset": 560
+        },
+        {
+          "name": "fast_switch_possible",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 4992,
+          "byte_offset": 624
+        },
+        {
+          "name": "fast_switch_enabled",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 5000,
+          "byte_offset": 625
+        },
+        {
+          "name": "strict_target",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 5008,
+          "byte_offset": 626
+        },
+        {
+          "name": "efficiencies_available",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 5016,
+          "byte_offset": 627
+        },
+        {
+          "name": "transition_delay_us",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 5024,
+          "byte_offset": 628
+        },
+        {
+          "name": "dvfs_possible_from_any_cpu",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 5056,
+          "byte_offset": 632
+        },
+        {
+          "name": "cached_target_freq",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 5088,
+          "byte_offset": 636
+        },
+        {
+          "name": "cached_resolved_idx",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 5120,
+          "byte_offset": 640
+        },
+        {
+          "name": "transition_ongoing",
+          "type": "_Bool",
+          "type_id": 94,
+          "bit_offset": 5152,
+          "byte_offset": 644
+        },
+        {
+          "name": "transition_lock",
+          "type": "spinlock",
+          "type_id": 121,
+          "bit_offset": 5184,
+          "byte_offset": 648
+        },
+        {
+          "name": "transition_wait",
+          "type": "wait_queue_head",
+          "type_id": 409,
+          "bit_offset": 5248,
+          "byte_offset": 656
+        },
+        {
+          "name": "transition_task",
+          "type": "task_struct *",
+          "type_id": 601,
+          "bit_offset": 5440,
+          "byte_offset": 680
+        },
+        {
+          "name": "stats",
+          "type": "cpufreq_stats *",
+          "type_id": 5046,
+          "bit_offset": 5504,
+          "byte_offset": 688
+        },
+        {
+          "name": "driver_data",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 5568,
+          "byte_offset": 696
+        },
+        {
+          "name": "cdev",
+          "type": "thermal_cooling_device *",
+          "type_id": 5047,
+          "bit_offset": 5632,
+          "byte_offset": 704
+        },
+        {
+          "name": "nb_min",
+          "type": "notifier_block",
+          "type_id": 858,
+          "bit_offset": 5696,
+          "byte_offset": 712
+        },
+        {
+          "name": "nb_max",
+          "type": "notifier_block",
+          "type_id": 858,
+          "bit_offset": 5888,
+          "byte_offset": 736
+        }
+      ]
+    },
+    "proc_ops": {
+      "type_ids": [
+        14050
+      ],
+      "size": 96,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "proc_flags",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "proc_open",
+          "type": "kind_13 *",
+          "type_id": 1763,
+          "bit_offset": 64,
+          "byte_offset": 8
+        },
+        {
+          "name": "proc_read",
+          "type": "kind_13 *",
+          "type_id": 287,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "proc_read_iter",
+          "type": "kind_13 *",
+          "type_id": 294,
+          "bit_offset": 192,
+          "byte_offset": 24
+        },
+        {
+          "name": "proc_write",
+          "type": "kind_13 *",
+          "type_id": 292,
+          "bit_offset": 256,
+          "byte_offset": 32
+        },
+        {
+          "name": "proc_lseek",
+          "type": "kind_13 *",
+          "type_id": 285,
+          "bit_offset": 320,
+          "byte_offset": 40
+        },
+        {
+          "name": "proc_release",
+          "type": "kind_13 *",
+          "type_id": 1763,
+          "bit_offset": 384,
+          "byte_offset": 48
+        },
+        {
+          "name": "proc_poll",
+          "type": "kind_13 *",
+          "type_id": 1757,
+          "bit_offset": 448,
+          "byte_offset": 56
+        },
+        {
+          "name": "proc_ioctl",
+          "type": "kind_13 *",
+          "type_id": 1759,
+          "bit_offset": 512,
+          "byte_offset": 64
+        },
+        {
+          "name": "proc_compat_ioctl",
+          "type": "kind_13 *",
+          "type_id": 1759,
+          "bit_offset": 576,
+          "byte_offset": 72
+        },
+        {
+          "name": "proc_mmap",
+          "type": "kind_13 *",
+          "type_id": 1761,
+          "bit_offset": 640,
+          "byte_offset": 80
+        },
+        {
+          "name": "proc_get_unmapped_area",
+          "type": "kind_13 *",
+          "type_id": 649,
+          "bit_offset": 704,
+          "byte_offset": 88
+        }
+      ]
+    },
+    "proc_inode": {
+      "type_ids": [
+        36652
+      ],
+      "size": 776,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "pid",
+          "type": "pid *",
+          "type_id": 1345,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "fd",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 64,
+          "byte_offset": 8
+        },
+        {
+          "name": "op",
+          "type": "proc_op",
+          "type_id": 36653,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "pde",
+          "type": "proc_dir_entry *",
+          "type_id": 823,
+          "bit_offset": 192,
+          "byte_offset": 24
+        },
+        {
+          "name": "sysctl",
+          "type": "ctl_table_header *",
+          "type_id": 847,
+          "bit_offset": 256,
+          "byte_offset": 32
+        },
+        {
+          "name": "sysctl_entry",
+          "type": "ctl_table *",
+          "type_id": 832,
+          "bit_offset": 320,
+          "byte_offset": 40
+        },
+        {
+          "name": "sibling_inodes",
+          "type": "hlist_node",
+          "type_id": 39,
+          "bit_offset": 384,
+          "byte_offset": 48
+        },
+        {
+          "name": "ns_ops",
+          "type": "proc_ns_operations *",
+          "type_id": 792,
+          "bit_offset": 512,
+          "byte_offset": 64
+        },
+        {
+          "name": "vfs_inode",
+          "type": "inode",
+          "type_id": 178,
+          "bit_offset": 576,
+          "byte_offset": 72
+        }
+      ]
+    },
+    "proc_dir_entry": {
+      "type_ids": [
+        36660
+      ],
+      "size": 176,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "in_use",
+          "type": "kind_4",
+          "type_id": 7,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "refcnt",
+          "type": "refcount_struct",
+          "type_id": 612,
+          "bit_offset": 32,
+          "byte_offset": 4
+        },
+        {
+          "name": "pde_openers",
+          "type": "list_head",
+          "type_id": 33,
+          "bit_offset": 64,
+          "byte_offset": 8
+        },
+        {
+          "name": "pde_unload_lock",
+          "type": "spinlock",
+          "type_id": 121,
+          "bit_offset": 192,
+          "byte_offset": 24
+        },
+        {
+          "name": "pde_unload_completion",
+          "type": "completion *",
+          "type_id": 840,
+          "bit_offset": 256,
+          "byte_offset": 32
+        },
+        {
+          "name": "proc_iops",
+          "type": "inode_operations *",
+          "type_id": 188,
+          "bit_offset": 320,
+          "byte_offset": 40
+        },
+        {
+          "name": "",
+          "type": "kind_5",
+          "type_id": 36658,
+          "bit_offset": 384,
+          "byte_offset": 48
+        },
+        {
+          "name": "proc_dops",
+          "type": "dentry_operations *",
+          "type_id": 215,
+          "bit_offset": 448,
+          "byte_offset": 56
+        },
+        {
+          "name": "",
+          "type": "kind_5",
+          "type_id": 36659,
+          "bit_offset": 512,
+          "byte_offset": 64
+        },
+        {
+          "name": "write",
+          "type": "kind_13 *",
+          "type_id": 36661,
+          "bit_offset": 576,
+          "byte_offset": 72
+        },
+        {
+          "name": "data",
+          "type": "<none> *",
+          "type_id": 19,
+          "bit_offset": 640,
+          "byte_offset": 80
+        },
+        {
+          "name": "state_size",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 704,
+          "byte_offset": 88
+        },
+        {
+          "name": "low_ino",
+          "type": "unsigned int",
+          "type_id": 48,
+          "bit_offset": 736,
+          "byte_offset": 92
+        },
+        {
+          "name": "nlink",
+          "type": "unsigned int",
+          "type_id": 36664,
+          "bit_offset": 768,
+          "byte_offset": 96
+        },
+        {
+          "name": "uid",
+          "type": "kind_4",
+          "type_id": 179,
+          "bit_offset": 800,
+          "byte_offset": 100
+        },
+        {
+          "name": "gid",
+          "type": "kind_4",
+          "type_id": 183,
+          "bit_offset": 832,
+          "byte_offset": 104
+        },
+        {
+          "name": "size",
+          "type": "long long",
+          "type_id": 88,
+          "bit_offset": 896,
+          "byte_offset": 112
+        },
+        {
+          "name": "parent",
+          "type": "proc_dir_entry *",
+          "type_id": 823,
+          "bit_offset": 960,
+          "byte_offset": 120
+        },
+        {
+          "name": "subdir",
+          "type": "rb_root",
+          "type_id": 401,
+          "bit_offset": 1024,
+          "byte_offset": 128
+        },
+        {
+          "name": "subdir_node",
+          "type": "rb_node",
+          "type_id": 108,
+          "bit_offset": 1088,
+          "byte_offset": 136
+        },
+        {
+          "name": "name",
+          "type": "char *",
+          "type_id": 36,
+          "bit_offset": 1280,
+          "byte_offset": 160
+        },
+        {
+          "name": "mode",
+          "type": "unsigned short",
+          "type_id": 156,
+          "bit_offset": 1344,
+          "byte_offset": 168
+        },
+        {
+          "name": "flags",
+          "type": "unsigned char",
+          "type_id": 68,
+          "bit_offset": 1360,
+          "byte_offset": 170
+        },
+        {
+          "name": "namelen",
+          "type": "unsigned char",
+          "type_id": 68,
+          "bit_offset": 1368,
+          "byte_offset": 171
+        },
+        {
+          "name": "inline_name",
+          "type": "kind_3",
+          "type_id": 682,
+          "bit_offset": 1376,
+          "byte_offset": 172
+        }
+      ]
+    },
+    "freq_attr": {
+      "type_ids": [
+        97808
+      ],
+      "size": 32,
+      "kflag": 0,
+      "members": [
+        {
+          "name": "attr",
+          "type": "attribute",
+          "type_id": 155,
+          "bit_offset": 0,
+          "byte_offset": 0
+        },
+        {
+          "name": "show",
+          "type": "kind_13 *",
+          "type_id": 5039,
+          "bit_offset": 128,
+          "byte_offset": 16
+        },
+        {
+          "name": "store",
+          "type": "kind_13 *",
+          "type_id": 97809,
+          "bit_offset": 192,
+          "byte_offset": 24
+        }
+      ]
+    }
+  },
+  "functions": {
+    "register_kprobe": [
+      {
+        "func_type_id": 21251,
+        "proto_type_id": 5842,
+        "return_type": "int",
+        "parameters": [
+          {
+            "name": "p",
+            "type": "kprobe *"
+          }
+        ]
+      }
+    ],
+    "copy_from_kernel_nofault": [
+      {
+        "func_type_id": 28745,
+        "proto_type_id": 28744,
+        "return_type": "long",
+        "parameters": [
+          {
+            "name": "dst",
+            "type": "<none> *"
+          },
+          {
+            "name": "src",
+            "type": "<none> *"
+          },
+          {
+            "name": "size",
+            "type": "unsigned long"
+          }
+        ]
+      }
+    ],
+    "kern_path": [
+      {
+        "func_type_id": 34403,
+        "proto_type_id": 34402,
+        "return_type": "int",
+        "parameters": [
+          {
+            "name": "name",
+            "type": "char *"
+          },
+          {
+            "name": "flags",
+            "type": "unsigned int"
+          },
+          {
+            "name": "path",
+            "type": "path *"
+          }
+        ]
+      }
+    ],
+    "seq_open": [
+      {
+        "func_type_id": 35360,
+        "proto_type_id": 35359,
+        "return_type": "int",
+        "parameters": [
+          {
+            "name": "file",
+            "type": "file *"
+          },
+          {
+            "name": "op",
+            "type": "seq_operations *"
+          }
+        ]
+      }
+    ],
+    "seq_read_iter": [
+      {
+        "func_type_id": 35361,
+        "proto_type_id": 28500,
+        "return_type": "long",
+        "parameters": [
+          {
+            "name": "iocb",
+            "type": "kiocb *"
+          },
+          {
+            "name": "iter",
+            "type": "iov_iter *"
+          }
+        ]
+      }
+    ],
+    "seq_read": [
+      {
+        "func_type_id": 35366,
+        "proto_type_id": 25484,
+        "return_type": "long",
+        "parameters": [
+          {
+            "name": "file",
+            "type": "file *"
+          },
+          {
+            "name": "buf",
+            "type": "char *"
+          },
+          {
+            "name": "size",
+            "type": "unsigned long"
+          },
+          {
+            "name": "ppos",
+            "type": "long long *"
+          }
+        ]
+      }
+    ],
+    "seq_lseek": [
+      {
+        "func_type_id": 35369,
+        "proto_type_id": 16157,
+        "return_type": "long long",
+        "parameters": [
+          {
+            "name": "file",
+            "type": "file *"
+          },
+          {
+            "name": "offset",
+            "type": "long long"
+          },
+          {
+            "name": "whence",
+            "type": "int"
+          }
+        ]
+      }
+    ],
+    "seq_release": [
+      {
+        "func_type_id": 35370,
+        "proto_type_id": 7639,
+        "return_type": "int",
+        "parameters": [
+          {
+            "name": "inode",
+            "type": "inode *"
+          },
+          {
+            "name": "file",
+            "type": "file *"
+          }
+        ]
+      }
+    ],
+    "proc_reg_open": [
+      {
+        "func_type_id": 38624,
+        "proto_type_id": 7639,
+        "return_type": "int",
+        "parameters": [
+          {
+            "name": "inode",
+            "type": "inode *"
+          },
+          {
+            "name": "file",
+            "type": "file *"
+          }
+        ]
+      }
+    ],
+    "cpuinfo_open": [
+      {
+        "func_type_id": 38898,
+        "proto_type_id": 7639,
+        "return_type": "int",
+        "parameters": [
+          {
+            "name": "inode",
+            "type": "inode *"
+          },
+          {
+            "name": "file",
+            "type": "file *"
+          }
+        ]
+      }
+    ],
+    "show_cpus_attr": [
+      {
+        "func_type_id": 76691,
+        "proto_type_id": 56083,
+        "return_type": "long",
+        "parameters": [
+          {
+            "name": "dev",
+            "type": "device *"
+          },
+          {
+            "name": "attr",
+            "type": "device_attribute *"
+          },
+          {
+            "name": "buf",
+            "type": "char *"
+          }
+        ]
+      }
+    ],
+    "physical_package_id_show": [
+      {
+        "func_type_id": 76876,
+        "proto_type_id": 4759,
+        "return_type": "long",
+        "parameters": [
+          {
+            "name": "dev",
+            "type": "device *"
+          },
+          {
+            "name": "attr",
+            "type": "device_attribute *"
+          },
+          {
+            "name": "buf",
+            "type": "char *"
+          }
+        ]
+      }
+    ],
+    "core_id_show": [
+      {
+        "func_type_id": 76878,
+        "proto_type_id": 4759,
+        "return_type": "long",
+        "parameters": [
+          {
+            "name": "dev",
+            "type": "device *"
+          },
+          {
+            "name": "attr",
+            "type": "device_attribute *"
+          },
+          {
+            "name": "buf",
+            "type": "char *"
+          }
+        ]
+      }
+    ],
+    "scaling_available_frequencies_show": [
+      {
+        "func_type_id": 97963,
+        "proto_type_id": 97858,
+        "return_type": "long",
+        "parameters": [
+          {
+            "name": "policy",
+            "type": "cpufreq_policy *"
+          },
+          {
+            "name": "buf",
+            "type": "char *"
+          }
+        ]
+      }
+    ],
+    "scaling_boost_frequencies_show": [
+      {
+        "func_type_id": 97964,
+        "proto_type_id": 97858,
+        "return_type": "long",
+        "parameters": [
+          {
+            "name": "policy",
+            "type": "cpufreq_policy *"
+          },
+          {
+            "name": "buf",
+            "type": "char *"
+          }
+        ]
+      }
+    ]
+  },
+  "named_types_or_functions": [
+    "copy_from_kernel_nofault",
+    "core_id_show",
+    "cpuinfo_open",
+    "kern_path",
+    "physical_package_id_show",
+    "proc_reg_open",
+    "register_kprobe",
+    "scaling_available_frequencies_show",
+    "scaling_boost_frequencies_show",
+    "seq_lseek",
+    "seq_open",
+    "seq_read",
+    "seq_read_iter",
+    "seq_release",
+    "show_cpus_attr"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "msm_kgsl": {
+    "file": "C:\\Users\\Administrator\\Desktop\\qilin\\kernel_profile_20261102_230543_25481\\btf\\msm_kgsl.btf",
+    "sha256": "678190f6b722bb3f405c81237841730fb12e651389dcb1383b6854dd84053c46",
+    "bytes": 249075,
+    "type_count": 5210,
+    "layouts": {},
+    "functions": {},
+    "named_types_or_functions": []
+  }
+}
