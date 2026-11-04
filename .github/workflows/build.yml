@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir -p build_logs
           {
-            echo 'BUILD_KIT_REVISION=full-inputs-r3'
+            echo 'BUILD_KIT_REVISION=build-kdir-fix-r4'
             pwd
             git rev-parse HEAD
             git ls-files -- self_check.py verify_kit.py TARGET_PROFILE.json TARGET_BTF.json TARGET_CONFIG.txt .github/workflows/build.yml
@@ -48,6 +48,17 @@ jobs:
         run: python3 -m pip install -r requirements.txt
       - name: Build external module with android14-6.1 DDK
         run: bash build.sh
+      - name: Print build diagnostics on failure
+        if: failure()
+        run: |
+          echo '===== build_logs/build.log ====='
+          if [ -f build_logs/build.log ]; then
+            cat build_logs/build.log
+          else
+            echo 'build_logs/build.log was not created'
+          fi
+          echo '===== build_logs inventory ====='
+          find build_logs -maxdepth 2 -type f -printf '%p %s bytes\n' 2>/dev/null || true
       - name: Upload verified PKG110 files
         if: success()
         uses: actions/upload-artifact@v4
