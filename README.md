@@ -28,7 +28,9 @@ KIT_VERIFIED=pkg110-ddk-r1 files=17
 SELF_CHECK=PASS shell_files=4 workflow=present target=PKG110
 ```
 
-如果日志仍显示 `files=16`，运行的是旧提交；先提交包含 `self_check.py` 的最新根目录文件，再从该提交重新运行 workflow。
+如果日志仍显示 `files=16`，运行的是旧提交；先提交完整源码包中的所有根目录文件，再从该提交重新运行 workflow。
+
+如果自检通过但编译步骤失败，新版会在同一页面的 `Print build diagnostics on failure` 步骤打印 `build_logs/build.log`。本版已显式把容器内的 `KDIR=/opt/ddk/kdir/android14-6.1` 传给 `make clean` 和 `make all`，避免顶层 Makefile 因 KDIR 为空直接退出。
 
 成功产物：
 

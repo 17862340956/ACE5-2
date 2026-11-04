@@ -36,6 +36,8 @@ def main() -> None:
                 fail("build.sh if/fi count mismatch")
             if "sha256sum cpuinfo_spoof.ko" not in text:
                 fail("build.sh output hash step missing")
+            if "KDIR_IN_IMAGE=/opt/ddk/kdir/android14-6.1" not in text:
+                fail("build.sh must pass the prepared DDK KDIR into the container")
     workflow = ROOT / ".github" / "workflows" / "build.yml"
     if not workflow.is_file():
         fail("missing .github/workflows/build.yml")

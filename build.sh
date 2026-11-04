@@ -6,6 +6,7 @@ LOG="$ROOT/build_logs"
 OUT="$ROOT/dist"
 mkdir -p "$LOG"
 exec >"$LOG/build.log" 2>&1
+trap 'rc=$?; if [ "$rc" -ne 0 ]; then printf "BUILD_FAILED exit=%s last_command=%s\\n" "$rc" "$BASH_COMMAND" >&2; fi' EXIT
 fail() {
   printf 'ERROR: %s\n' "$*" >&2
   exit 1
@@ -29,8 +30,13 @@ docker image inspect "$IMAGE_ID" > "$LOG/image-inspect.json"
 docker run --platform linux/amd64 --rm -v "$ROOT:/build" -w /build "$IMAGE_ID" sh -c 'clang --version' > "$LOG/clang-version.txt"
 cat "$LOG/clang-version.txt"
 grep -q 'r487747c' "$LOG/clang-version.txt" || fail 'Target requires clang-r487747c'
-docker run --platform linux/amd64 --rm -v "$ROOT:/build" -w /build "$IMAGE_ID" make clean
-docker run --platform linux/amd64 --rm -v "$ROOT:/build" -w /build "$IMAGE_ID" make all LLVM=1 LLVM_IAS=1 -j"${QILIN_JOBS:-2}"
+# The DDK image keeps the prepared kernel output under this path. Passing KDIR
+# explicitly avoids the top-level Makefile's intentional missing-KDIR failure.
+KDIR_IN_IMAGE=/opt/ddk/kdir/android14-6.1
+docker run --platform linux/amd64 --rm -v "$ROOT:/build" -w /build "$IMAGE_ID" \
+  env KDIR="$KDIR_IN_IMAGE" ARCH=arm64 LLVM=1 LLVM_IAS=1 make clean
+docker run --platform linux/amd64 --rm -v "$ROOT:/build" -w /build "$IMAGE_ID" \
+  env KDIR="$KDIR_IN_IMAGE" ARCH=arm64 LLVM=1 LLVM_IAS=1 make all -j"${QILIN_JOBS:-2}"
 [ -s cpuinfo_spoof.ko ] || fail 'No module produced'
 cp cpuinfo_spoof.ko "$LOG/cpuinfo_spoof.raw.ko"
 if [ -s cpuinfo_spoof.mod.c ]; then
