@@ -1,0 +1,67 @@
+name: PKG110 SM8650 6.1 KO r1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ko:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show checkout identity
+        run: |
+          git rev-parse HEAD
+          echo 'BUILD_KIT=pkg110-ddk-r1'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify checkout root
+        working-directory: ${{ github.workspace }}
+        run: |
+          mkdir -p build_logs
+          {
+            echo 'BUILD_KIT_REVISION=checkout-fix-r2'
+            pwd
+            git rev-parse HEAD
+            git ls-files -- self_check.py verify_kit.py .github/workflows/build.yml
+          } | tee build_logs/checkout.txt
+          for required in self_check.py verify_kit.py .github/workflows/build.yml; do
+            if [ ! -f "$required" ]; then
+              echo "::error::Missing $required in this checkout. Commit the extracted patch files, then start a NEW workflow run on that branch; Re-run jobs keeps the original commit."
+              exit 1
+            fi
+          done
+          echo 'CHECKOUT_ROOT=present'
+      - name: Verify build inputs and syntax
+        run: |
+          python3 verify_kit.py
+          python3 self_check.py
+          bash -n build.sh
+          bash -n ddk
+          sh -n prepare_ddk.sh
+          sh -n run.sh
+      - name: Install report dependency
+        run: python3 -m pip install -r requirements.txt
+      - name: Build external module with android14-6.1 DDK
+        run: bash build.sh
+      - name: Upload verified PKG110 files
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkg110-ko-r1-${{ github.run_id }}
+          if-no-files-found: error
+          path: dist/**
+      - name: Upload full diagnostics even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkg110-diagnostics-r1-${{ github.run_id }}
+          if-no-files-found: warn
+          path: |
+            build_logs/**
+            KIT_MANIFEST.json
+            TARGET_PROFILE.json
