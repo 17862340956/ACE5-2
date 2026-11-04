@@ -1,0 +1,6 @@
+# Preserve evidence/config bytes used by SHA256 checks.
+* -text
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+ddk text eol=lf

@@ -1,0 +1,1082 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ============================================================================
+# DDK - Driver Development Kit Manager
+# ============================================================================
+# A unified tool for building Android kernel modules using Docker containers
+# or local DDK installations.
+#
+# Features:
+#   - Dual mode: local (native) and docker (containerized) builds
+#   - Multiple image sources: GitHub, Docker Hub, CNB mirror
+#   - Auto-detection of available targets in local mode
+#   - Interactive shell with pre-configured build environment
+#   - Self-updating capability
+#
+# Configuration:
+#   ~/.ddk/source  - Image source (cnb/github/docker)
+#   ~/.ddk/mode    - Run mode (local/docker)
+#   ~/.ddk/mapping.json - Target to clang version mapping
+#   .ddk-version   - Project-level target version (in project directory)
+#
+# Environment Variables:
+#   DDK_ROOT   - Local DDK installation path (default: /opt/ddk)
+#   DDK_TARGET - Default build target
+#
+# Target Resolution Priority:
+#   1. Command line argument (--target or positional)
+#   2. .ddk-version file in current directory
+#   3. DDK_TARGET environment variable
+#
+# ============================================================================
+# Global Variables
+# ============================================================================
+prog=$(basename "$0")
+DDK_CONFIG_DIR="$HOME/.ddk"
+DDK_SOURCE_CONFIG="$DDK_CONFIG_DIR/source"
+DDK_MODE_CONFIG="$DDK_CONFIG_DIR/mode"
+DDK_MAPPING_JSON="$DDK_CONFIG_DIR/mapping.json"
+DDK_ROOT="${DDK_ROOT:-/opt/ddk}"
+DDK_MODE=""
+SOURCE=""
+IMAGE_BASE=""
+CMD=""
+TARGET=""
+MAKE_ARGS=()
+ENV_VARS=()
+DOCKER_COMMON_ARGS=(--platform linux/amd64 --rm -v "$(pwd)":/build -w /build)
+
+# ============================================================================
+# Utility Functions
+# ============================================================================
+
+ensure_dependency() {
+  local cmd=$1
+  if ! command -v "$cmd" &> /dev/null; then
+    echo "Error: '$cmd' is required but not installed" >&2
+    echo "Please install '$cmd' and try again" >&2
+    exit 1
+  fi
+}
+
+usage() {
+  cat <<EOF
+Usage: $prog <command> [options] [-- <make-args>]
+
+Commands:
+  list                                        List all pulled DDK images
+  list-all                                    List all available DDK targets from repository
+  pull <target>|--target <target>             Pull image $IMAGE_BASE:<target>
+  build [<target>] [--target <target>] [-- <make-args>]
+                                              Run 'make' inside container (for building)
+  clean [<target>] [--target <target>]
+                                              Run 'make clean' inside container
+  compdb [<target>] [--target <target>]
+                                              Run 'make compdb' and update VSCode clangd settings
+  shell [<target>] [--target <target>]
+                                              Start an interactive shell in the container
+  update                                      Update ddk script to the latest version
+
+Options:
+  --target, -t   image tag like 'android12-5.10'
+                 (Priority: command arg > .ddk-version file > DDK_TARGET env)
+  --env, -e      pass environment variable (can be used multiple times)
+                 Example: --env CONFIG_FOO=y -e CONFIG_BAR=n
+  (docker platform is forced to linux/amd64)
+  -h, --help     show this help
+
+Target Resolution:
+  1. Command line argument (--target or positional)
+  2. .ddk-version file in current directory
+  3. DDK_TARGET environment variable
+
+Examples:
+  $prog list
+  $prog list-all
+  $prog pull android12-5.10
+  $prog pull --target android12-5.10
+  $prog build android12-5.10 -- CFLAGS=-O2
+  $prog build --target android12-5.10 -- CFLAGS=-O2
+  $prog clean -t android12-5.10
+  $prog compdb android12-5.10
+  $prog shell android12-5.10
+  $prog update
+
+  # Using environment variables:
+  $prog build android12-5.10 --env CONFIG_FOO=y -e CONFIG_BAR=n
+  $prog shell -t android12-5.10 --env DEBUG=1
+
+  # Using .ddk-version file:
+  echo "android12-5.10" > .ddk-version
+  $prog build    # Will use android12-5.10 from .ddk-version
+  $prog clean    # Will use android12-5.10 from .ddk-version
+EOF
+}
+
+# ============================================================================
+# Configuration Functions
+# ============================================================================
+
+migrate_config() {
+  # Migration: if ~/.ddk is a file, migrate to directory structure
+  if [[ -f "$DDK_CONFIG_DIR" && ! -L "$DDK_CONFIG_DIR" ]]; then
+    echo "Migrating configuration from file to directory structure..."
+    local old_source
+    old_source=$(cat "$DDK_CONFIG_DIR")
+    rm -f "$DDK_CONFIG_DIR"
+    mkdir -p "$DDK_CONFIG_DIR"
+    echo "$old_source" > "$DDK_SOURCE_CONFIG"
+    echo "Migration completed: $DDK_CONFIG_DIR is now a directory"
+  fi
+}
+
+ensure_config_dir() {
+  if [[ ! -d "$DDK_CONFIG_DIR" ]]; then
+    mkdir -p "$DDK_CONFIG_DIR"
+  fi
+}
+
+configure_mode() {
+  # Check if DDK_ROOT exists and configure mode
+  if [[ -d "$DDK_ROOT" ]] && [[ ! -f "$DDK_MODE_CONFIG" ]]; then
+    echo "DDK_ROOT ($DDK_ROOT) detected. Please select running mode:"
+    echo "1. local  (use local DDK installation)"
+    echo "2. docker (use Docker containers)"
+    echo ""
+    echo "Waiting 30 seconds (default: docker)..."
+
+    local mode_choice=""
+    if read -t 30 -p "Enter your choice (1/2): " mode_choice; then
+      echo ""
+    else
+      echo ""
+      echo "Timeout: defaulting to docker mode"
+      mode_choice="2"
+    fi
+
+    case "$mode_choice" in
+      1)
+        echo "local" > "$DDK_MODE_CONFIG"
+        echo "Selected: local mode"
+        ;;
+      2)
+        echo "docker" > "$DDK_MODE_CONFIG"
+        echo "Selected: docker mode"
+        ;;
+      *)
+        echo "Invalid option, defaulting to docker mode" >&2
+        echo "docker" > "$DDK_MODE_CONFIG"
+        ;;
+    esac
+  fi
+
+  # Determine running mode
+  if [[ -f "$DDK_MODE_CONFIG" ]]; then
+    DDK_MODE=$(cat "$DDK_MODE_CONFIG")
+
+    # Validate mode value
+    if [[ ! "$DDK_MODE" =~ ^(local|docker)$ ]]; then
+      echo "Warning: Invalid mode '$DDK_MODE' in config, resetting to docker" >&2
+      echo "docker" > "$DDK_MODE_CONFIG"
+      DDK_MODE="docker"
+    fi
+  else
+    DDK_MODE="docker"
+  fi
+
+  # Check dependencies for local mode
+  if [[ "$DDK_MODE" == "local" ]]; then
+    ensure_dependency jq
+  fi
+}
+
+configure_source() {
+  # Initialize config if not exists
+  if [[ ! -f "$DDK_SOURCE_CONFIG" ]]; then
+    echo "First run detected. Please select an image source:"
+    echo "1. cnb (docker.cnb.cool/ylarod/ddk/ddk)"
+    echo "2. github (ghcr.io/ylarod/ddk)"
+    echo "3. docker (docker.io/ylarod/ddk)"
+    echo ""
+    echo "Waiting 30 seconds (default: github)..."
+
+    local choice=""
+    if read -t 30 -p "Enter your choice (1/2/3): " choice; then
+      echo ""
+    else
+      echo ""
+      echo "Timeout: defaulting to github source"
+      choice="2"
+    fi
+
+    case "$choice" in
+      1)
+        echo "cnb" > "$DDK_SOURCE_CONFIG"
+        echo "Selected: cnb source"
+        ;;
+      2)
+        echo "github" > "$DDK_SOURCE_CONFIG"
+        echo "Selected: github source"
+        ;;
+      3)
+        echo "docker" > "$DDK_SOURCE_CONFIG"
+        echo "Selected: docker source"
+        ;;
+      *)
+        echo "Invalid option, defaulting to github source" >&2
+        echo "github" > "$DDK_SOURCE_CONFIG"
+        ;;
+    esac
+  fi
+
+  # Read configured source
+  SOURCE=$(cat "$DDK_SOURCE_CONFIG")
+
+  # Validate source value
+  if [[ ! "$SOURCE" =~ ^(cnb|github|docker)$ ]]; then
+    echo "Warning: Invalid source '$SOURCE' in config, resetting to github" >&2
+    echo "github" > "$DDK_SOURCE_CONFIG"
+    SOURCE="github"
+  fi
+
+  # Set IMAGE_BASE based on source
+  case "$SOURCE" in
+    cnb)
+      IMAGE_BASE="docker.cnb.cool/ylarod/ddk/ddk"
+      ;;
+    github)
+      IMAGE_BASE="ghcr.io/ylarod/ddk"
+      ;;
+    docker)
+      IMAGE_BASE="docker.io/ylarod/ddk"
+      ;;
+    *)
+      echo "Warning: unknown source configuration '$SOURCE', using default github source" >&2
+      IMAGE_BASE="ghcr.io/ylarod/ddk"
+      ;;
+  esac
+}
+
+download_mapping_json() {
+  local mapping_url
+  case "$SOURCE" in
+    cnb)
+      mapping_url="https://cnb.cool/Ylarod/ddk/-/git/raw/main/mapping.json?download=true"
+      ;;
+    github|docker|*)
+      mapping_url="https://raw.githubusercontent.com/Ylarod/ddk/main/mapping.json"
+      ;;
+  esac
+
+  echo "Downloading mapping.json from: $mapping_url"
+  if curl -fsSL "$mapping_url" -o "$DDK_MAPPING_JSON"; then
+    echo "Successfully downloaded mapping.json"
+    return 0
+  else
+    echo "Error: failed to download mapping.json" >&2
+    return 1
+  fi
+}
+
+ensure_mapping_json() {
+  # For local mode, ensure mapping.json exists
+  if [[ "$DDK_MODE" == "local" ]] && [[ ! -f "$DDK_MAPPING_JSON" ]]; then
+    download_mapping_json
+  fi
+}
+
+init_config() {
+  migrate_config
+  ensure_config_dir
+  configure_mode
+  configure_source
+  ensure_mapping_json
+}
+
+# ============================================================================
+# Target Resolution Functions
+# ============================================================================
+
+# Read target from .ddk-version file in current directory
+# Returns:
+#   Echoes the target string if file exists and is valid
+#   Echoes empty string if file doesn't exist or is empty
+get_target_from_version_file() {
+  local version_file=".ddk-version"
+
+  if [[ -f "$version_file" ]]; then
+    # Read and trim whitespace
+    local target
+    target=$(cat "$version_file" | tr -d '[:space:]')
+
+    if [[ -n "$target" ]]; then
+      echo "$target"
+      return 0
+    fi
+  fi
+
+  echo ""
+  return 0
+}
+
+# ============================================================================
+# Argument Parsing Functions
+# ============================================================================
+
+# Parse command-line arguments and extract TARGET and MAKE_ARGS
+# Args:
+#   $@ - command and arguments (first arg is command name)
+# Sets globals:
+#   CMD - the command name (e.g., build, clean, shell)
+#   TARGET - the build target (e.g., android12-5.10)
+#   MAKE_ARGS - array of additional make arguments
+parse_args() {
+  CMD=$1
+  shift
+
+  TARGET=""
+  MAKE_ARGS=()
+  ENV_VARS=()
+
+  # Simple flag/positional parser
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --target|-t)
+        TARGET="$2"; shift 2;;
+      --env|-e)
+        ENV_VARS+=("$2"); shift 2;;
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      --)
+        shift
+        MAKE_ARGS=("$@")
+        break
+        ;;
+      -*)
+        # unknown flag for wrapper - treat as error
+        echo "Unknown option: $1" >&2
+        exit 2
+        ;;
+      *)
+        # positional: if no target yet, take this as target; otherwise treat as a make arg
+        if [[ -z "$TARGET" ]]; then
+          TARGET="$1"
+        else
+          MAKE_ARGS+=("$1")
+        fi
+        shift
+        ;;
+    esac
+  done
+}
+
+# ============================================================================
+# Local Mode Functions
+# ============================================================================
+
+# List available local DDK targets by checking directory existence
+# Reads matrix from mapping.json and verifies:
+#   - $DDK_ROOT/src/<android-version> exists
+#   - $DDK_ROOT/clang/<clang-version> exists
+# Displays:
+#   - Available targets (both dirs exist): ✓
+#   - Incomplete targets (one dir missing): ✗
+#   - Missing targets (both dirs missing): not shown
+# Note: jq dependency is checked in configure_mode() for local mode
+local_list() {
+  # Ensure mapping.json exists
+  if [[ ! -f "$DDK_MAPPING_JSON" ]]; then
+    echo "Error: mapping.json not found at $DDK_MAPPING_JSON" >&2
+    echo "Please run 'ddk update' first" >&2
+    exit 1
+  fi
+
+  echo "Available local DDK targets:"
+  echo "----------------------------"
+
+  # Parse matrix from mapping.json
+  local matrix_count
+  matrix_count=$(jq '.matrix | length' "$DDK_MAPPING_JSON")
+
+  local available_count=0
+  local incomplete_count=0
+
+  for ((i=0; i<matrix_count; i++)); do
+    local android clang
+    android=$(jq -r ".matrix[$i].android" "$DDK_MAPPING_JSON")
+    clang=$(jq -r ".matrix[$i].clang" "$DDK_MAPPING_JSON")
+
+    # Check if required directories exist
+    local src_dir="$DDK_ROOT/src/$android"
+    local clang_dir="$DDK_ROOT/clang/$clang"
+    local src_exists=false
+    local clang_exists=false
+
+    [[ -d "$src_dir" ]] && src_exists=true
+    [[ -d "$clang_dir" ]] && clang_exists=true
+
+    # Both exist - available target
+    if $src_exists && $clang_exists; then
+      echo "  $android ✓ (src: $android ✓, clang: $clang ✓)"
+      available_count=$((available_count + 1))
+    # Only one exists - incomplete
+    elif $src_exists || $clang_exists; then
+      local src_mark="✗"
+      local clang_mark="✗"
+      $src_exists && src_mark="✓"
+      $clang_exists && clang_mark="✓"
+      echo "  $android ✗ (src: $src_mark, clang: $clang_mark)"
+      incomplete_count=$((incomplete_count + 1))
+    fi
+    # Both don't exist - skip (no output)
+  done
+
+  echo ""
+  if [[ $available_count -eq 0 ]] && [[ $incomplete_count -eq 0 ]]; then
+    echo "No targets found in $DDK_ROOT"
+    echo "Please ensure the following directories exist:"
+    echo "  - \$DDK_ROOT/src/<android-version>"
+    echo "  - \$DDK_ROOT/clang/<clang-version>"
+  else
+    echo "Summary: $available_count available, $incomplete_count incomplete"
+  fi
+}
+
+# Get the corresponding clang version for a given Android target
+# Args:
+#   $1 - Android target name (e.g., android12-5.10)
+# Returns:
+#   Echoes the clang version string (e.g., clang-r416183b)
+# Exit codes:
+#   0 - Success
+#   1 - Target not found in mapping.json
+# Note: jq dependency is checked in configure_mode() for local mode
+get_clang_for_target() {
+  local target=$1
+
+  if [[ ! -f "$DDK_MAPPING_JSON" ]]; then
+    echo "Error: mapping.json not found at $DDK_MAPPING_JSON" >&2
+    exit 1
+  fi
+
+  # Find clang version for the target
+  local clang
+  clang=$(jq -r ".matrix[] | select(.android == \"$target\") | .clang" "$DDK_MAPPING_JSON")
+
+  if [[ -z "$clang" || "$clang" == "null" ]]; then
+    echo "Error: No clang version found for target '$target'" >&2
+    exit 1
+  fi
+
+  echo "$clang"
+}
+
+get_rust_for_target() {
+  local target=$1
+
+  if [[ ! -f "$DDK_MAPPING_JSON" ]]; then
+    return 0
+  fi
+
+  local rust
+  rust=$(jq -r ".matrix[] | select(.android == \"$target\") | .rust // empty" "$DDK_MAPPING_JSON")
+
+  echo "$rust"
+}
+
+# Setup local build environment variables
+# Args:
+#   $1 - Android target name
+# Sets exports:
+#   DDK_ORIGINAL_PATH - backup of original PATH
+#   KDIR - kernel source directory
+#   CLANG_PATH - clang binary directory
+#   PATH - prepends CLANG_PATH to PATH
+#   CROSS_COMPILE, ARCH, LLVM, LLVM_IAS - build flags
+# Note:
+#   Call restore_local_env() after use to cleanup
+setup_local_env() {
+  local target=$1
+  local clang rust
+
+  clang=$(get_clang_for_target "$target")
+  rust=$(get_rust_for_target "$target")
+
+  # Backup PATH
+  export DDK_ORIGINAL_PATH="$PATH"
+
+  # Setup DDK environment
+  export KDIR="$DDK_ROOT/kdir/$target"
+  export CLANG_PATH="$DDK_ROOT/clang/$clang/bin"
+  export PATH="$CLANG_PATH:$PATH"
+
+  # Setup Rust if available
+  if [[ -n "$rust" ]]; then
+    export RUST_PATH="$DDK_ROOT/rust/$rust/bin"
+    if [[ -d "$RUST_PATH" ]]; then
+      export PATH="$RUST_PATH:$PATH"
+    fi
+    # bindgen dlopen's libclang; without this it picks up the system one,
+    # which is usually too old for the kernel's CFLAGS
+    export LIBCLANG_PATH="$DDK_ROOT/clang/$clang/lib"
+  fi
+
+  export CROSS_COMPILE=aarch64-linux-gnu-
+  export ARCH=arm64
+  export LLVM=1
+  export LLVM_IAS=1
+
+  # Verify directories exist
+  if [[ ! -d "$KDIR" ]]; then
+    echo "Error: Kernel source directory not found: $KDIR" >&2
+    exit 1
+  fi
+
+  if [[ ! -d "$CLANG_PATH" ]]; then
+    echo "Error: Clang directory not found: $CLANG_PATH" >&2
+    exit 1
+  fi
+
+  # Export user-defined environment variables
+  if [[ ${#ENV_VARS[@]} -gt 0 ]]; then
+    for env_var in "${ENV_VARS[@]}"; do
+      export "$env_var"
+    done
+  fi
+
+  echo "Environment setup:"
+  echo "  KDIR=$KDIR"
+  echo "  CLANG_PATH=$CLANG_PATH"
+  if [[ -n "${RUST_PATH:-}" ]]; then
+    echo "  RUST_PATH=$RUST_PATH"
+    echo "  LIBCLANG_PATH=$LIBCLANG_PATH"
+  fi
+  echo "  ARCH=$ARCH"
+  if [[ ${#ENV_VARS[@]} -gt 0 ]]; then
+    echo "  Custom env vars:"
+    for env_var in "${ENV_VARS[@]}"; do
+      echo "    $env_var"
+    done
+  fi
+  echo ""
+}
+
+# Restore environment after local build/clean operations
+# Unsets all variables set by setup_local_env()
+# This ensures the user's environment is not polluted
+restore_local_env() {
+  # Restore PATH
+  if [[ -n "${DDK_ORIGINAL_PATH:-}" ]]; then
+    export PATH="$DDK_ORIGINAL_PATH"
+    unset DDK_ORIGINAL_PATH
+  fi
+
+  # Unset DDK-specific variables
+  unset KDIR
+  unset CLANG_PATH
+  unset RUST_PATH
+  unset LIBCLANG_PATH
+  unset CROSS_COMPILE
+  unset ARCH
+  unset LLVM
+  unset LLVM_IAS
+}
+
+local_build() {
+  echo "Building target: $TARGET"
+  echo ""
+
+  setup_local_env "$TARGET"
+
+  echo "Running make..."
+  if [[ ${#MAKE_ARGS[@]} -eq 0 ]]; then
+    make
+  else
+    make "${MAKE_ARGS[@]}"
+  fi
+
+  local build_result=$?
+  restore_local_env
+
+  if [[ $build_result -eq 0 ]]; then
+    echo ""
+    echo "Build completed successfully"
+  else
+    echo ""
+    echo "Build failed with exit code $build_result" >&2
+    exit $build_result
+  fi
+}
+
+local_clean() {
+  echo "Cleaning target: $TARGET"
+  echo ""
+
+  setup_local_env "$TARGET"
+
+  echo "Running make clean..."
+  make clean
+
+  local clean_result=$?
+  restore_local_env
+
+  if [[ $clean_result -eq 0 ]]; then
+    echo ""
+    echo "Clean completed successfully"
+  else
+    echo ""
+    echo "Clean failed with exit code $clean_result" >&2
+    exit $clean_result
+  fi
+}
+
+local_compdb() {
+  echo "Generating compilation database for target: $TARGET"
+  echo ""
+
+  local clang
+  clang=$(get_clang_for_target "$TARGET")
+
+  setup_local_env "$TARGET"
+
+  echo "Running make compdb..."
+  make compdb
+
+  local compdb_result=$?
+  restore_local_env
+
+  if [[ $compdb_result -ne 0 ]]; then
+    echo ""
+    echo "Compilation database generation failed with exit code $compdb_result" >&2
+    exit $compdb_result
+  fi
+
+  echo ""
+  echo "Compilation database generated successfully"
+
+  # Update .vscode/settings.json
+  local vscode_dir=".vscode"
+  local settings_file="$vscode_dir/settings.json"
+  local clangd_path="/opt/ddk/clang/$clang/bin/clangd"
+
+  echo "Updating VSCode settings..."
+
+  # Create .vscode directory if it doesn't exist
+  if [[ ! -d "$vscode_dir" ]]; then
+    echo "Creating $vscode_dir directory..."
+    mkdir -p "$vscode_dir"
+  fi
+
+  # Update or create settings.json
+  if [[ -f "$settings_file" ]]; then
+    # File exists, update it
+    if command -v jq &> /dev/null; then
+      # Use jq if available for proper JSON manipulation
+      local temp_file
+      temp_file=$(mktemp)
+      jq --arg path "$clangd_path" '.["clangd.path"] = $path' "$settings_file" > "$temp_file" && mv "$temp_file" "$settings_file"
+      echo "Updated clangd.path in $settings_file"
+    else
+      # Fallback: simple sed-based update
+      if grep -q '"clangd.path"' "$settings_file"; then
+        sed -i "s|\"clangd.path\"[[:space:]]*:[[:space:]]*\"[^\"]*\"|\"clangd.path\": \"$clangd_path\"|g" "$settings_file"
+        echo "Updated clangd.path in $settings_file"
+      else
+        # Add clangd.path entry before the closing brace
+        sed -i "s|}$|,\n  \"clangd.path\": \"$clangd_path\"\n}|" "$settings_file"
+        echo "Added clangd.path to $settings_file"
+      fi
+    fi
+  else
+    # File doesn't exist, create new one
+    cat > "$settings_file" <<EOF
+{
+  "clangd.path": "$clangd_path"
+}
+EOF
+    echo "Created $settings_file with clangd.path"
+  fi
+
+  echo ""
+  echo "VSCode clangd settings updated: clangd.path = $clangd_path"
+  echo "Compilation database setup completed successfully"
+}
+
+local_shell() {
+  echo "Starting interactive shell for target: $TARGET"
+  echo ""
+
+  local clang rust
+
+  clang=$(get_clang_for_target "$TARGET")
+  rust=$(get_rust_for_target "$TARGET")
+
+  # Setup environment variables for the subshell
+  export KDIR="$DDK_ROOT/kdir/$TARGET"
+  export CLANG_PATH="$DDK_ROOT/clang/$clang/bin"
+  export PATH="$CLANG_PATH:$PATH"
+
+  # Setup Rust if available
+  if [[ -n "$rust" ]]; then
+    export RUST_PATH="$DDK_ROOT/rust/$rust/bin"
+    if [[ -d "$RUST_PATH" ]]; then
+      export PATH="$RUST_PATH:$PATH"
+    fi
+    # bindgen dlopen's libclang; without this it picks up the system one,
+    # which is usually too old for the kernel's CFLAGS
+    export LIBCLANG_PATH="$DDK_ROOT/clang/$clang/lib"
+  fi
+
+  export CROSS_COMPILE=aarch64-linux-gnu-
+  export ARCH=arm64
+  export LLVM=1
+  export LLVM_IAS=1
+
+  # Export user-defined environment variables
+  if [[ ${#ENV_VARS[@]} -gt 0 ]]; then
+    for env_var in "${ENV_VARS[@]}"; do
+      export "$env_var"
+    done
+  fi
+
+  # Verify directories exist
+  if [[ ! -d "$KDIR" ]]; then
+    echo "Error: Kernel source directory not found: $KDIR" >&2
+    exit 1
+  fi
+
+  if [[ ! -d "$CLANG_PATH" ]]; then
+    echo "Error: Clang directory not found: $CLANG_PATH" >&2
+    exit 1
+  fi
+
+  echo "Environment variables set:"
+  echo "  DDK_ROOT=$DDK_ROOT"
+  echo "  KDIR=$KDIR"
+  echo "  CLANG_PATH=$CLANG_PATH"
+  if [[ -n "${RUST_PATH:-}" ]]; then
+    echo "  RUST_PATH=$RUST_PATH"
+    echo "  LIBCLANG_PATH=$LIBCLANG_PATH"
+  fi
+  echo "  CROSS_COMPILE=$CROSS_COMPILE"
+  echo "  ARCH=$ARCH"
+  echo "  LLVM=$LLVM"
+  echo "  LLVM_IAS=$LLVM_IAS"
+  if [[ ${#ENV_VARS[@]} -gt 0 ]]; then
+    echo "  Custom env vars:"
+    for env_var in "${ENV_VARS[@]}"; do
+      echo "    $env_var"
+    done
+  fi
+  echo ""
+  echo "Type 'exit' to leave the shell"
+  echo "=========================================="
+  echo ""
+
+  # Start a new shell with the environment
+  # Prefer bash if available, fall back to sh
+  if command -v bash &> /dev/null; then
+    bash --noprofile --norc
+  else
+    sh
+  fi
+
+  echo ""
+  echo "Exited DDK shell"
+}
+
+# ============================================================================
+# Docker Mode Functions
+# ============================================================================
+
+run_docker() {
+  # run_docker [extra docker args...] -- <cmd...>
+  local docker_args=("${DOCKER_COMMON_ARGS[@]}")
+
+  # Add environment variables
+  if [[ ${#ENV_VARS[@]} -gt 0 ]]; then
+    for env_var in "${ENV_VARS[@]}"; do
+      docker_args+=("-e" "$env_var")
+    done
+  fi
+
+  while [[ $# -gt 0 ]]; do
+    if [[ "$1" == "--" ]]; then shift; break; fi
+    docker_args+=("$1"); shift
+  done
+  # remaining args are command to run
+  docker run "${docker_args[@]}" "$IMAGE" "$@"
+}
+
+# ============================================================================
+# Command Handlers
+# ============================================================================
+
+cmd_list() {
+  if [[ "$DDK_MODE" == "local" ]]; then
+    local_list
+  else
+    echo "Pulled DDK images:"
+    docker images --filter "reference=$IMAGE_BASE" --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}"
+  fi
+}
+
+cmd_list_all() {
+  # Use local mapping.json if exists, otherwise download
+  if [[ ! -f "$DDK_MAPPING_JSON" ]]; then
+    echo "Local mapping.json not found, downloading..."
+    if ! download_mapping_json; then
+      exit 1
+    fi
+  fi
+
+  echo "Available Targets (from local mapping.json):"
+  echo "---------------------------------------------"
+
+  # Check if jq is available
+  if command -v jq &> /dev/null; then
+    jq -r '.android[] | .name' "$DDK_MAPPING_JSON" | sed 's/^/  /'
+  else
+    # Fallback: simple grep-based parsing if jq is not available
+    grep -o '"name": "[^"]*"' "$DDK_MAPPING_JSON" | cut -d'"' -f4 | sed 's/^/  /'
+  fi
+}
+
+update_self() {
+  local script_path
+  script_path=$(command -v ddk 2>/dev/null || echo "")
+  if [[ -z "$script_path" ]]; then
+    echo "Error: cannot find ddk script location" >&2
+    return 1
+  fi
+
+  script_path=$(readlink -f "$script_path" 2>/dev/null || realpath "$script_path" 2>/dev/null || echo "$script_path")
+
+  # Determine download URL based on source
+  local download_url
+  case "$SOURCE" in
+    cnb)
+      download_url="https://cnb.cool/Ylarod/ddk/-/git/raw/main/scripts/ddk?download=true"
+      ;;
+    github|docker|*)
+      download_url="https://raw.githubusercontent.com/Ylarod/ddk/main/scripts/ddk"
+      ;;
+  esac
+
+  echo "Updating ddk script at: $script_path"
+  echo "Downloading from: $download_url"
+
+  local temp_file
+  temp_file=$(mktemp)
+  # Setup trap to cleanup temp file on exit/interrupt
+  trap 'rm -f "$temp_file"' INT TERM
+
+  if curl -fsSL "$download_url" -o "$temp_file"; then
+    if mv -f "$temp_file" "$script_path" 2>/dev/null && chmod 755 "$script_path" 2>/dev/null; then
+      echo "Successfully updated ddk script"
+      trap - INT TERM  # Clear trap on success
+      return 0
+    else
+      echo "Need sudo permission to update $script_path"
+      if sudo mv -f "$temp_file" "$script_path" && sudo chmod 755 "$script_path"; then
+        echo "Successfully updated ddk script"
+        trap - INT TERM  # Clear trap on success
+        return 0
+      else
+        rm -f "$temp_file"
+        trap - INT TERM  # Clear trap on failure
+        echo "Error: failed to update ddk script" >&2
+        return 1
+      fi
+    fi
+  else
+    rm -f "$temp_file"
+    trap - INT TERM  # Clear trap on failure
+    echo "Error: failed to download latest ddk script" >&2
+    return 1
+  fi
+}
+
+update_mapping() {
+  echo "Updating mapping.json..."
+  if download_mapping_json; then
+    echo "Successfully updated mapping.json"
+    return 0
+  else
+    echo "Warning: failed to update mapping.json" >&2
+    return 1
+  fi
+}
+
+cmd_update() {
+  local update_success=true
+
+  # Update ddk script
+  if ! update_self; then
+    update_success=false
+  fi
+
+  # Update mapping.json for all modes
+  echo ""
+  if ! update_mapping; then
+    update_success=false
+  fi
+
+  if [[ "$update_success" == "false" ]]; then
+    exit 1
+  fi
+}
+
+cmd_pull() {
+  if [[ "$DDK_MODE" == "local" ]]; then
+    echo "Error: 'pull' command is not supported in local mode" >&2
+    exit 1
+  fi
+
+  local image="$IMAGE_BASE:${TARGET}"
+  echo "Pulling image: $image"
+  docker pull "$image"
+}
+
+cmd_build() {
+  if [[ "$DDK_MODE" == "local" ]]; then
+    local_build
+    return
+  fi
+
+  local image="$IMAGE_BASE:${TARGET}"
+  echo "Building in container: $image"
+
+  # If MAKE_ARGS empty, just call make
+  if [[ ${#MAKE_ARGS[@]} -eq 0 ]]; then
+    IMAGE="$image" run_docker -- make
+  else
+    IMAGE="$image" run_docker -- make "${MAKE_ARGS[@]}"
+  fi
+}
+
+cmd_clean() {
+  if [[ "$DDK_MODE" == "local" ]]; then
+    local_clean
+    return
+  fi
+
+  local image="$IMAGE_BASE:${TARGET}"
+  echo "Cleaning in container: $image"
+  IMAGE="$image" run_docker -- make clean
+}
+
+cmd_compdb() {
+  if [[ "$DDK_MODE" == "local" ]]; then
+    local_compdb
+    return
+  fi
+
+  local image="$IMAGE_BASE:${TARGET}"
+  echo "Generating compilation database in container: $image"
+  IMAGE="$image" run_docker -- make compdb
+}
+
+cmd_shell() {
+  if [[ "$DDK_MODE" == "local" ]]; then
+    local_shell
+    return
+  fi
+
+  local image="$IMAGE_BASE:${TARGET}"
+  echo "Starting interactive shell in: $image"
+  # Prefer bash if available inside image, fall back to sh
+  docker run -it "${DOCKER_COMMON_ARGS[@]}" "$image" sh -c 'if [ -x /bin/bash ]; then exec /bin/bash; else exec /bin/sh; fi'
+}
+
+# ============================================================================
+# Main Function
+# ============================================================================
+
+main() {
+  # Check for help or no arguments
+  if [[ $# -lt 1 ]]; then
+    usage
+    exit 1
+  fi
+
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    usage
+    exit 0
+  fi
+
+  # Initialize configuration
+  init_config
+
+  # Parse command and arguments
+  parse_args "$@"
+
+  # Handle commands that don't need TARGET
+  case "$CMD" in
+    list)
+      cmd_list
+      exit 0
+      ;;
+    list-all)
+      cmd_list_all
+      exit 0
+      ;;
+    update)
+      cmd_update
+      exit 0
+      ;;
+  esac
+
+  # Validate TARGET for commands that need it
+  if [[ -z "$TARGET" ]]; then
+    # Try .ddk-version file first
+    local version_file_target
+    version_file_target=$(get_target_from_version_file)
+    if [[ -n "$version_file_target" ]]; then
+      TARGET="$version_file_target"
+      echo "Using target from .ddk-version: $TARGET"
+    # Then try environment variable fallback
+    elif [[ -n "${DDK_TARGET:-}" ]]; then
+      TARGET="$DDK_TARGET"
+      echo "Using target from DDK_TARGET: $TARGET"
+    else
+      echo "Error: target is required. Use --target or provide it as the first positional argument," >&2
+      echo "       or create a .ddk-version file, or set DDK_TARGET environment variable." >&2
+      usage
+      exit 2
+    fi
+  fi
+
+  # Handle commands that need TARGET
+  case "$CMD" in
+    pull)
+      cmd_pull
+      ;;
+    build)
+      cmd_build
+      ;;
+    clean)
+      cmd_clean
+      ;;
+    compdb)
+      cmd_compdb
+      ;;
+    shell)
+      cmd_shell
+      ;;
+    *)
+      echo "Unknown command: $CMD" >&2
+      usage
+      exit 2
+      ;;
+  esac
+}
+
+# ============================================================================
+# Entry Point
+# ============================================================================
+
+main "$@"
