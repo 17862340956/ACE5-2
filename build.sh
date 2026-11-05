@@ -5,8 +5,10 @@ cd "$ROOT"
 LOG="$ROOT/build_logs"
 OUT="$ROOT/dist"
 mkdir -p "$LOG"
+# Preserve the original Actions stream on fd 3 for failure replay.
+exec 3>&1
 exec >"$LOG/build.log" 2>&1
-trap 'rc=$?; if [ "$rc" -ne 0 ]; then printf "BUILD_FAILED exit=%s last_command=%s\\n" "$rc" "$BASH_COMMAND" >&2; fi' EXIT
+trap 'rc=$?; if [ "$rc" -ne 0 ]; then printf "BUILD_FAILED exit=%s last_command=%s\n" "$rc" "$BASH_COMMAND" >&2; printf "===== build.log replay =====\n" >&3; cat "$LOG/build.log" >&3; fi' EXIT
 fail() {
   printf 'ERROR: %s\n' "$*" >&2
   exit 1
