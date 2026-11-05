@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir -p build_logs
           {
-            echo 'BUILD_KIT_REVISION=build-kdir-fix-r4'
+            echo 'BUILD_KIT_REVISION=build-log-replay-r5'
             pwd
             git rev-parse HEAD
             git ls-files -- self_check.py verify_kit.py TARGET_PROFILE.json TARGET_BTF.json TARGET_CONFIG.txt .github/workflows/build.yml
