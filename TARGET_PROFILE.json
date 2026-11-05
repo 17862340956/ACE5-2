@@ -11,6 +11,9 @@
   "sdk": 36,
   "config_sha256": "46108facbb8eee9c4e721243cf8687ffb97d7dcde49aae08cf49071baeebb661",
   "btf_sha256": "3e689a4312d2fea4a7a053ccf1d0d48bd6922f84e3006ba11e073d47a8e42422",
+  "vermagic_flags": "SMP preempt mod_unload modversions aarch64",
+  "layout_symbol": "pkg110_layout_values",
+  "layout_expected_values": [0, 764, 48, 0, 40, 64, 96, 64, 72, 24, 176, 48, 92, 120, 160, 168, 170],
   "display_preset": "HUAWEI Kirin 9020 / 12 核三簇",
   "author": "杏仁 / xingren",
   "topology": {
