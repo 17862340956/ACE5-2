@@ -74,6 +74,7 @@ static int last_error;
 static int check_uts = -EAGAIN, check_cpuinfo = -EAGAIN;
 static int check_cpus = -EAGAIN, check_topology = -EAGAIN, check_cpufreq = -EAGAIN;
 static bool pinned, wants_uts, wants_cpuinfo, uts_applied;
+static struct file *cpuinfo_file;
 static struct path cpuinfo_path;
 static bool cpuinfo_path_held;
 static struct proc_ops cpuinfo_ops_clone;
@@ -286,7 +287,8 @@ static_assert(__same_type(((struct proc_ops *)0)->proc_open, &fake_cpuinfo_open)
 static void release_cpuinfo_path(void)
 {
 	if (cpuinfo_path_held) {
-		path_put(&cpuinfo_path);
+		filp_close(cpuinfo_file, NULL);
+		cpuinfo_file = NULL;
 		cpuinfo_path_held = false;
 	}
 }
@@ -309,9 +311,13 @@ static int plan_cpuinfo(void)
 	/* The private offsets above are target-specific. Check inode, PDE name,
 	 * parent, inode number and exact operations identity before any write.
 	 */
-	ret = kern_path("/proc/cpuinfo", LOOKUP_FOLLOW, &cpuinfo_path);
-	if (ret)
+	cpuinfo_file = filp_open("/proc/cpuinfo", O_RDONLY | O_LARGEFILE, 0);
+	if (IS_ERR(cpuinfo_file)) {
+		ret = PTR_ERR(cpuinfo_file);
+		cpuinfo_file = NULL;
 		return ret;
+	}
+	cpuinfo_path = cpuinfo_file->f_path;
 	cpuinfo_path_held = true;
 	ret = copy_from_kernel_nofault(&inode,
 		(char *)cpuinfo_path.dentry + TARGET_DENTRY_INODE_OFFSET, sizeof(inode));
